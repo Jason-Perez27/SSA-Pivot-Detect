@@ -3,25 +3,46 @@ Repository for detecting activity status in center pivots across Sub-Saharan Afr
 
 Authors: Jason Perez, Anna Boser, Kelly Caylor
 
+## Setup
+The code in this directory is written in Python, and we use anaconda and a requirements.txt to manage our packages. Download anaconda and run the following commands in your terminal to set up your environment: 
+
+```{bash}
+conda create -n cp_pipeline python=3.9 -y
+conda activate cp_pipeline
+pip install -r requirements.txt
+```
+
 ## Shapefile containing Center Pivots across the World
 
-You can obtain the shp file containing the world's center pivots [here](https://github.com/DetectCPIS/global_cpis_shp)
+You can obtain the shp file containing the world's center pivots [here](https://github.com/DetectCPIS/global_cpis_shp). 
 
-## Code Description and Packages
+To extract the Center Pivots identified in 2021, download all files in [this folder](https://github.com/DetectCPIS/global_cpis_shp/tree/main/World_CPIS_2021) and run the following code in the terminal: 
 
-| File Name and Location | Necessary Packages in Environment
-|---------------|----------------|
-| `code/cp_data_subset/id_cp.py` | `pip install geopandas os`
-| `code/cp_data_subset/id_filter_cp.py`   | `pip install geopandas os random`
-| `code/cp_data_subset/ee_landsat_data.py` | `pip install earthengine-api geopandas os random numpy re`
-| `code/cp_data_subset/ee_landsat_data.py` | `pip install geopandas os`
+```{bash}
+cd ~/Downloads 
+zip -s 0 World_CPIS_2021.zip --out World_CPIS_2021_together.zip
+unzip World_CPIS_2021_together.zip
+```
+
+## Inventory of the data folder
+Because many of the data used in this project are too large to upload to GitHub, the data folder is in the .gitignore file and therefore none of its contents are uploaded. However, here we include a description of all datasets and their location within the data folder. These data can also be found in [this google drive folder](https://drive.google.com/drive/folders/1tpn4sNm4YDX0psiPLOqaD3Kvbd8m87Re?usp=drive_link). 
+
+- map.goejson: A geojson of Sub-Saharan Africa, used to subset only CPIS in SSA in `code/cp_data_subset/2_id_filter_cp.py`
+- World_CPIS_2021
+    - The original World CPIS data from [this folder](https://github.com/DetectCPIS/global_cpis_shp/tree/main/World_CPIS_2021)
+    - A modified version of this dataset with IDs, created in `code/cp_data_subset/1_id_cp.py`
+    - Only the CPIS to be used for training and testing (whose IDs appear in `data/cp_ids.txt`). Created in `code/cp_data_subset/3_data_subset.py`
+- cp_ids.txt
+    - A list of CP IDs to be used in training and testing of the algorithm. Determined in `code/cp_data_subset/2_id_filter_cp.py`. 
+
+## Code Description
 
 | File Name and Location | Purpose of Code
 |---------------|----------------|
-| `code/cp_data_subset/id_cp.py` | Assigns ID column and Unique ID's to Center Pivots
-| `code/cp_data_subset/id_filter_cp.py`   | Filters CP's to include a representative example of SSA, saves ID's in a test file
-| `code/cp_data_subset/data_subset.py` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 8 and 9
-| `code/cp_data_subset/data_subset.py` | Uses SHP file and txt file to filter the shape file to include CP's who have ID's listed in the text file
+| `code/cp_data_subset/1_id_cp.py` | Assigns ID column and Unique ID's to Center Pivots
+| `code/cp_data_subset/2_id_filter_cp.py`   | Filters CP's to include a representative example of SSA, saves ID's in a test file
+| `code/cp_data_subset/3_data_subset.py` | Uses SHP file and txt file to filter the shape file to include CP's who have ID's listed in the text file
+| `?` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 8 and 9
 
 ## Obtaining a subset of training/test data
 
