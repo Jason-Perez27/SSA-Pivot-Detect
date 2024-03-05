@@ -42,15 +42,20 @@ Because many of the data used in this project are too large to upload to GitHub,
 | `code/cp_data_subset/1_id_cp.py` | Assigns ID column and Unique ID's to Center Pivots
 | `code/cp_data_subset/2_id_filter_cp.py`   | Filters CP's to include a representative example of SSA, saves ID's in a test file
 | `code/cp_data_subset/3_data_subset.py` | Uses SHP file and txt file to filter the shape file to include CP's who have ID's listed in the text file
-| `?` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 8 and 9
+| `code/labeling_data/1_gee_req.py` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 7, 8 and 9
 
 ## Obtaining a subset of training/test data
 
 1. To get our subsets of training and test data we first need to download the shp file containing all center pivots across the world. We also need to use [geojson](geojson.io) to create a JSON file with the geometric shape of Sub-Saharan Africa. This can be done by using geojson's line feature which will allow you to trace your shape and export the coordinates (Lattitude and Longitude) into a JSON file.
 
-2. We then need to assign ID's to all the center pivots in our global CP shp file so that we can later filter/subset these center pivots to fit a representative dataset of center pivots across Sub-Saharan Africa. The script `id_cp.py` reads in our global shape file and creates a new column for "ID", which will create a unique ID for each center pivot in the shp file.
+2. We then need to assign ID's to all the center pivots in our global CP shp file so that we can later filter/subset these center pivots to fit a representative dataset of center pivots across Sub-Saharan Africa. The script `1_id_cp.py` reads in our global shape file and creates a new column for "ID", which will create a unique ID for each center pivot in the shp file.
 
-3. Our next step is to filter our shape file to only include CP's in Sub-Saharan Africa and make our samples representative of all of SSA. The script `id_filter_cp.py` reads in our GeoJSON map to only include CP's located in SSA. Then by using a stratisfying method, our GeoJSON map is split into multiple grid cells. The script then randomly samples a maximum of 4 center pivots per grid and saves their Center Pivot ID into a text file.
+3. Our next step is to filter our shape file to only include CP's in Sub-Saharan Africa and make our samples representative of all of SSA. The script `2_id_filter_cp.py` reads in our GeoJSON map to only include CP's located in SSA. Then by using a stratisfying method, our GeoJSON map is split into multiple grid cells. The script then randomly samples a maximum of 4 center pivots per grid and saves their Center Pivot ID into a text file.
 
-4. Since we now have our text file containing our desired center pivots and our shapefile containing CP ID's we then use `data_subset.py` which allows us to filter our shapefile to only include center pivots who's ID's are listed in the text file. 
+4. Since we now have our text file containing our desired center pivots and our shapefile containing CP ID's we then use `3_data_subset.py` which allows us to filter our shapefile to only include center pivots who's ID's are listed in the text file. 
 
+## Using Google Earth Engine to Request Landsat Data and Creating Images for Labeling
+
+1. Now that we have a shp file with our subsetted center pivots across SSA we will use `1_gee_req.py` to request Landsat data for the center pivots in our shp file. This script utilizes object-oriented programming to create a "LandsatExporter" class that can be called to request data. This script divides our center pivots into groups of 5, then calls the "LandsatExporter" for each group. This script requires Google Earth Engine API, as well as access to Google Drive. The script will return TIF images to the identified Google Drive folder and be named by the ID, year, and month.
+
+2. To label these images we must convert the TIFs into JPEG images. Using the script `2_cp_image_creator` we will define our folder of requested TIF images as our input, then this script will run recursively over each tif image and create a total of 4 images per TIF. Due to inconsistencies in labeling based on color, we also create 4 additional images to our standard RGB that we will label. The first additional image created utilizes the National Vegetation Index based on a calculation of bands 3 and 4. This image will allow us to see if there is vegetation on a given center pivot. The next image utilizes Land Surface Temperature and allows us to determine if a center pivot is being irrigated. The final image is a combination of the RGB, NDVI, and LST images side by side to use when labeling.
