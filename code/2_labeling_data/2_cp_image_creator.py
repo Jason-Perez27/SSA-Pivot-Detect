@@ -7,13 +7,13 @@ from PIL import Image
 def rescale_to_8bit(band_array, min_value=None, max_value=None):
     valid_pixels = band_array[~np.isnan(band_array)]
     if len(valid_pixels) == 0:
-        min_value = 0  # Set a default minimum value
-        max_value = 255  # Set a default maximum value
+        min_value = 0  
+        max_value = 255  
     else:
         if min_value is None:
-            min_value = np.percentile(valid_pixels, 2)  # 2nd percentile
+            min_value = np.percentile(valid_pixels, 2)  
         if max_value is None:
-            max_value = np.percentile(valid_pixels, 98)  # 98th percentile
+            max_value = np.percentile(valid_pixels, 98)  
 
     band_array = np.clip(band_array, min_value, max_value)
     band_array -= min_value
