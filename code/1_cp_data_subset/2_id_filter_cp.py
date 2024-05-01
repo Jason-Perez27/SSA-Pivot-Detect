@@ -23,7 +23,7 @@ original_cp_gdf['centroid'] = original_cp_gdf['geometry'].centroid
 center_pivots_in_ssa = gpd.sjoin(original_cp_gdf, ssa_bbox_gdf, op='intersects')
 
 # Divide Sub-Saharan Africa into grid cells
-grid_size = 1  # Adjust this value based on your needs
+grid_size = 1  
 center_pivots_in_ssa['grid'] = center_pivots_in_ssa.apply(
     lambda row: (
         int(row.centroid.x / grid_size),
