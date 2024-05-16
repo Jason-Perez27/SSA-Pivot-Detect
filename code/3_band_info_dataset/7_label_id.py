@@ -7,11 +7,11 @@ data = pd.read_csv(csv_file)
 # Define a function to convert Label to Label ID
 def label_to_id(label):
     if label == "Active CP":
-        return 0
+        return "1"
     elif label == "Inactive CP":
-        return 1
+        return "0"
     elif label == "No CP":
-        return 2
+        return "0"
     else:
         return None
 
@@ -24,6 +24,6 @@ column_order.insert(7, column_order.pop(column_order.index('Label ID')))
 data = data[column_order]
 
 # Save the modified DataFrame back to CSV
-data.to_csv('/Users/jasonperez/filtered_no_clouds.csv', index=False)
+data.to_csv('/Users/jasonperez/filtered_no_clouds_label_id.csv', index=False)
 
 print("CSV file has been processed and saved with the new 'Label ID' column.")

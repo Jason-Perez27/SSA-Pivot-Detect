@@ -1,3 +1,4 @@
 geopandas
 earthengine-api
 numpy
+sklearn
