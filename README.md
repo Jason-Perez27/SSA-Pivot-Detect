@@ -107,14 +107,9 @@ Because many of the data used in this project are too large to upload to GitHub,
 3. In the script `1_cross_valid_model.py` we began improving our model by adding additional features that were calculated/gathered from data within our training dataset. In order to determine what features could be included to improve the performance of the model, the script includes functions that calculate the correlation between features and the encoded labels. It also returns which features held the most importance during the cross-validation process, allowing us to analyze which features should be added. As a result of the labeling criteria for active CP's heavily focusing on land surface temperature and vegetation, our next step was to use the Landsat band info to calculate LST, GNDVI, and EVI. Including these features provides the model with insight as to whether there is irrigation or vegetation. `1_cross_valid_model.py` also includes "spatial features" which provide the context of the land surrounding the center pivots by using their (lat, lon) coordinates. Due to our model performing a binary classification, we used a confidence threshold of 0.5. After performing data preprocessing and altering our model to include additional features, we once again performed our 5-fold cross-validation to assess how our model is performing.
 
 **Updated `1_cross_valid_model.py` Classification Report**
-             `precision    recall  f1-score   support`
 
-           0       0.86      0.93      0.89      3079
-           1       0.90      0.80      0.85      2434
+<img width="640" alt="Screen Shot 2024-05-16 at 4 57 13 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/3a23299e-d8da-47ea-85e0-4c2081e874cb">
 
-    accuracy                           0.87      5513
-  `macro avg       0.88      0.86      0.87      5513`
-  `weighted avg    0.88      0.87      0.87      5513`
 
 4. The script `2_cv_bar_graph.py` utilizes the same methodology for classification as `1_cross_valid_model.py`; however, the purpose of this script is to create a bar graph plot of our cross-validation scores. This script performs 5-fold group cross-validation on our training set, then uses "precision", "recall", and "F1-score" to create a bar graph. Precision represents the model's ability to correctly identify the assigned label (accuracy metric for specific labels). Recall score is a metric that represents the percentage of the relevant cases the model got correct (percentage of true positives correctly identified out of all true positives in the dataset). The f-1 score is a metric that conveys a mean average between the precision and recall scores.
 
