@@ -39,11 +39,25 @@ Because many of the data used in this project are too large to upload to GitHub,
 
 | File Name and Location | Purpose of Code
 |---------------|----------------|
-| `code/cp_data_subset/1_id_cp.py` | Assigns ID column and Unique ID's to Center Pivots
-| `code/cp_data_subset/2_id_filter_cp.py`   | Filters CP's to include a representative example of SSA, saves ID's in a test file
-| `code/cp_data_subset/3_data_subset.py` | Uses SHP file and txt file to filter the shape file to include CP's who have ID's listed in the text file
-| `code/labeling_data/1_gee_req.py` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 7, 8 and 9
-| `code/labeling_data/2_cp_image_creator` | Converts TIF images from Google Earth Engine into 4 images. RGB, NDVI, LST, and Combined.
+| `code/1_cp_data_subset/1_id_cp.py` | Assigns ID column and Unique ID's to Center Pivots
+| `code/1_cp_data_subset/2_id_filter_cp.py`   | Filters CP's to include a representative example of SSA, saves ID's in a test file
+| `code/1_cp_data_subset/3_data_subset.py` | Uses SHP file and txt file to filter the shape file to include CP's who have ID's listed in the text file
+| `code/2_labeling_data/1_gee_req.py` | Uses Google Earth Engine to request Landsat data of Center Pivots, will request data from Landsat 4, 5, 7, 8 and 9
+| `code/2_labeling_data/2_cp_image_creator` | Converts TIF images from Google Earth Engine into 4 images. RGB, NDVI, LST, and Combined.
+| `code/3_band_info_dataset/1_band_names.py` | Creates a text file including the band names for each CP TIF image
+| `code/3_band_info_dataset/2_tif_gjsons.py` | Creates a GeoJSON bounding box in (lat, lon) for each CP TIF image
+| `code/3_band_info_dataset/3_bands_qa_unsplit_dataset.py` | Reads in files/annotations and extracts bands/info for our complete unsplit dataset
+| `code/3_band_info_dataset/4_dataset_columns.py` | Changes band info column names from a numerical identifier to their actual meaning
+| `code/3_band_info_dataset/5_decode_qa_bands.py` | Decodes quality control bands to binary bits and evaluates if a TIF image includes clouds or cloud shadows
+| `code/3_band_info_dataset/6_filter_cloud_data.py` | Uses the decoded binary to assess which images contain clouds, and filter them out of the dataset
+| `code/3_band_info_dataset/7_label_id.py` | Assigns numerical binary label ID and merges our "Inactive" and "No CP" classes (Class 0)
+| `code/3_band_info_dataset/8_training_test_split.py` | Creates 70/30 training/test datasets and ensures CPs with the same TIF ID are part of the same dataset
+| `code/4_cross_validation_model/1_cross_valid_model.py` | Rainforest classification model that uses 5-fold cross-validation returning a classification report of the cross-validation
+| `code/4_cross_validation_model/2_cv_bar_graph.py` | Performs the cross validation like `1_cross_valid_model.py`, using the cross-validation scores to return a bar graph of the "precision", "recall", and "F1-score" values
+| `code/4_cross_validation_model/3_cv_ssa_map.py` | Using cross-validation scores this script returns a map of Africa consisting of the CP locations and model performance
+| `code/4_cross_validation_model/4_cv_conf_matrix.py` | | Using cross-validation scores this script returns a 2x2 confusion matrix
+| `code/4_cross_validation_model/5_feature_plot.py` | Creates a horizontal bar graph conveying the importance of each feature provided to the model
+
 ## Obtaining a subset of training/test data
 
 1. To get our subsets of training and test data we first need to download the shp file containing all center pivots across the world. We also need to use [geojson](geojson.io) to create a JSON file with the geometric shape of Sub-Saharan Africa. This can be done by using geojson's line feature which will allow you to trace your shape and export the coordinates (Lattitude and Longitude) into a JSON file.
