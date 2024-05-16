@@ -55,7 +55,7 @@ Because many of the data used in this project are too large to upload to GitHub,
 | `code/4_cross_validation_model/1_cross_valid_model.py` | Rainforest classification model that uses 5-fold cross-validation returning a classification report of the cross-validation
 | `code/4_cross_validation_model/2_cv_bar_graph.py` | Performs the cross validation like `1_cross_valid_model.py`, using the cross-validation scores to return a bar graph of the "precision", "recall", and "F1-score" values
 | `code/4_cross_validation_model/3_cv_ssa_map.py` | Using cross-validation scores this script returns a map of Africa consisting of the CP locations and model performance
-| `code/4_cross_validation_model/4_cv_conf_matrix.py` | | Using cross-validation scores this script returns a 2x2 confusion matrix
+| `code/4_cross_validation_model/4_cv_conf_matrix.py` | Using cross-validation scores this script returns a 2x2 confusion matrix
 | `code/4_cross_validation_model/5_feature_plot.py` | Creates a horizontal bar graph conveying the importance of each feature provided to the model
 
 ## Obtaining a subset of training/test data
