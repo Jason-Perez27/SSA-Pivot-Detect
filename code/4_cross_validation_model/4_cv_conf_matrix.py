@@ -46,18 +46,6 @@ longitude = data['X-Coord']
 X['Latitude'] = latitude
 X['Longitude'] = longitude
 
-# Add spatial features to give context about surrounding area
-band_names = ['Blue', 'Green', 'Red', 'Near_Infrared', 'SWIR1', 'Thermal', 'SWIR2', 'TIRS1', 'TIRS2']
-radius = 2  
-for idx, row in X.iterrows():
-    lat = row['Latitude']
-    lon = row['Longitude']
-    dist_squared = (X['Latitude'] - lat)**2 + (X['Longitude'] - lon)**2
-    pixels_within_radius = dist_squared < radius**2
-    for band in band_names:
-        # Calculate mean and std dev for pixels within the radius
-        X.loc[idx, f'SpatialMean_{band}'] = data.loc[pixels_within_radius, band].mean(skipna=True)
-        X.loc[idx, f'SpatialStd_{band}'] = data.loc[pixels_within_radius, band].std(skipna=True)
 
 # Calculate additional vegetation indices to check for vegeatation on the keypoint annotation
 X['EVI'] = 2.5 * (X['Near_Infrared'] - X['Red']) / (X['Near_Infrared'] + 6 * X['Red'] - 7.5 * X['Blue'] + 1)

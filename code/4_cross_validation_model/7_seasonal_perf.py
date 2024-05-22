@@ -12,9 +12,6 @@ from sklearn.preprocessing import StandardScaler
 csv_file_path = '/Users/jasonperez/Desktop/bands_info_training.csv'
 data = pd.read_csv(csv_file_path)
 
-# Check for any NaN values right after loading the data
-print("Initial NaN values in data:\n", data.isna().sum())
-
 # Exclude columns we don't want as features in our model
 excluded_columns = ['TIF Name', 'Pixel_QA', 'Cloud_QA', 'X Value', 'Y Value']
 
@@ -34,10 +31,6 @@ data['Encoded Label'] = label_encoder.fit_transform(data['Label ID'])
 # Exclude the Label column which holds a string
 data = data.drop(columns=excluded_columns + ['Label'])
 
-# Determine what features correlate to the labels
-correlations = data.corr()
-print("Correlations with Encoded Label:\n", correlations['Encoded Label'].sort_values(ascending=False))
-
 # Define features and target
 X = data.drop(columns=['Encoded Label', 'Label ID'])
 y = data['Encoded Label']
@@ -48,21 +41,6 @@ longitude = data['X-Coord']
 X['Latitude'] = latitude
 X['Longitude'] = longitude
 
-# Check for NaN values after adjusting lat/lon features
-print("NaN values after handling lat/long:\n", X.isna().sum())
-
-# Add spatial features to give context about surrounding area
-band_names = ['Blue', 'Green', 'Red', 'Near_Infrared', 'SWIR1', 'Thermal', 'SWIR2', 'TIRS1', 'TIRS2']
-radius = 2  
-for idx, row in X.iterrows():
-    lat = row['Latitude']
-    lon = row['Longitude']
-    dist_squared = (X['Latitude'] - lat)**2 + (X['Longitude'] - lon)**2
-    pixels_within_radius = dist_squared < radius**2
-    for band in band_names:
-        # Calculate mean and std dev for pixels within the radius
-        X.loc[idx, f'SpatialMean_{band}'] = data.loc[pixels_within_radius, band].mean(skipna=True)
-        X.loc[idx, f'SpatialStd_{band}'] = data.loc[pixels_within_radius, band].std(skipna=True)
 
 # Calculate additional vegetation indices to check for vegeatation on the keypoint annotation
 X['EVI'] = 2.5 * (X['Near_Infrared'] - X['Red']) / (X['Near_Infrared'] + 6 * X['Red'] - 7.5 * X['Blue'] + 1)
@@ -116,8 +94,7 @@ lst_values_swa_TIRS = calculate_lst_swa_TIRS(TIRS1, TIRS2)
 X['LST_SWA_TIRS'] = lst_values_swa_TIRS
 lst_values_swa_thermal = calculate_lst_swa_thermal(thermal_value)
 X['LST_SWA_THERMAL'] = lst_values_swa_thermal
-# Check for NaN values before model fitting
-print("NaN values before model fitting:\n", X.isna().sum())
+
 
 # Define the groups based on the first column of the CSV file
 groups = data.iloc[:, 0]
@@ -172,7 +149,7 @@ report = classification_report(true_labels, predicted_labels, labels=label_encod
 
 feature_importances = classifier.feature_importances_
 sorted_indices = np.argsort(feature_importances)[::-1]
-print("Feature Importances:")
+
 for idx in sorted_indices:
     print(f"{X.columns[idx]}: {feature_importances[idx]}")
 def month_to_season(month):
