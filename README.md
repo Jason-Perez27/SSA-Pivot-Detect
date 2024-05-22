@@ -127,3 +127,5 @@ Because many of the data used in this project are too large to upload to GitHub,
 7. When evaluating our model and trying to improve its performance, identifying the features that most benefit the model can reveal trends or types of data that benefit the model more than other features. In order to get a better understanding of how my model was predicting labels the script `5_feature_importance.py` creates a horizontal bar graph to display each feature considered in the model, as well as how important it was in determining the probability of an active center pivot.
 
 <img width="1066" alt="Screen Shot 2024-05-16 at 12 24 33 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/881b96e3-e7d0-4965-9566-27b32bdd67d6">
+
+8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of SSA and uses the F-1 scores calculated during the cross validation to show performance within the grids. The script uses grid cell size 3 for visible segmentations of the map.
