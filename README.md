@@ -128,8 +128,11 @@ Because many of the data used in this project are too large to upload to GitHub,
 
 <img width="1066" alt="Screen Shot 2024-05-16 at 12 24 33 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/881b96e3-e7d0-4965-9566-27b32bdd67d6">
 
-8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of SSA and uses the F-1 scores calculated during the cross-validation to show performance within the grids. The script uses grid cell size 3 for visible segmentations of the map.
+8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of SSA and uses the F-1 scores calculated during the cross-validation to show performance within the grids. The script uses grid cell size 2 for visible segmentations of the map.
 
+<img width="817" alt="Screen Shot 2024-05-22 at 4 38 29 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/12ffe825-f332-4cd0-ae7d-91d8eba79263">
 
 
 9. The script `7_seasonal_perf.py` analyzes the performance of the model by season. Giving the accuracy, precision, recall, and f-1 scores for each season.  
+<img width="194" alt="Screen Shot 2024-05-22 at 4 37 23 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/e11ba711-1779-4f37-8efe-50abc859e1cd"><img width="194" alt="Screen Shot 2024-05-22 at 4 37 05 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/bfe3178c-c06d-4f7c-a551-a102543534a7">
+
