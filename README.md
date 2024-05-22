@@ -118,7 +118,7 @@ Because many of the data used in this project are too large to upload to GitHub,
 
 5. Similar to the previous script, `3_cv_ssa_map.py` uses our model's cross-validation and creates a visual based on its scores. This script first reads in our GeoJSON file containing the bounding box of SSA. Since our GeoJSON map is saved in EPSG 4326, we can visualize performance by location/region. This script returns a map of SSA with the locations of the CP labels. Green dots represent that the model correctly identified the label, while red means that the model failed to identify the correct label.
 
-<img width="1201" alt="Screen Shot 2024-05-16 at 11 26 27 AM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/db345194-8855-443e-b7b2-8107a0ce3f60">
+![new_ssa_map](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/b0835f27-a8a2-4f4c-8326-41806795838d)
 
 6. Now that we received our scores we want additional knowledge on where the model was incorrectly identifying labels. To do this we use our cross-validation scores in the script `4_cv_conf_matrix.py` to create a 2x2 confusion matrix. In this image, the Y-axis identifies the true labels, while the X-axis represents the predicted labels provided by the model. The top left box displays the correctly identified "Inactive/No CP" labels and the bottom right conveys the correctly identified "Active CP" labels. The bottom left demonstrates CPs that were predicted to be inactive but were actually active, and the top right demonstrates CPs the model predicted were active but were inactive or had no CP.
 
@@ -130,7 +130,6 @@ Because many of the data used in this project are too large to upload to GitHub,
 
 8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of SSA and uses the F-1 scores calculated during the cross-validation to show performance within the grids. The script uses grid cell size 3 for visible segmentations of the map.
 
-   ![new_ssa_map](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/b0835f27-a8a2-4f4c-8326-41806795838d)
 
 
 9. The script `7_seasonal_perf.py` analyzes the performance of the model by season. Giving the accuracy, precision, recall, and f-1 scores for each season.  
