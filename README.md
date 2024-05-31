@@ -27,13 +27,53 @@ unzip World_CPIS_2021_together.zip
 ## Inventory of the data folder
 Because many of the data used in this project are too large to upload to GitHub, the data folder is in the .gitignore file and therefore none of its contents are uploaded. However, here we include a description of all datasets and their location within the data folder. These data can also be found in [this google drive folder](https://drive.google.com/drive/folders/1tpn4sNm4YDX0psiPLOqaD3Kvbd8m87Re?usp=drive_link). 
 
-- map.goejson: A geojson of Sub-Saharan Africa, used to subset only CPIS in SSA in `code/cp_data_subset/2_id_filter_cp.py`
 - World_CPIS_2021
     - The original World CPIS data from [this folder](https://github.com/DetectCPIS/global_cpis_shp/tree/main/World_CPIS_2021)
     - A modified version of this dataset with IDs, created in `code/cp_data_subset/1_id_cp.py`
     - Only the CPIS to be used for training and testing (whose IDs appear in `data/cp_ids.txt`). Created in `code/cp_data_subset/3_data_subset.py`
-- cp_ids.txt
-    - A list of CP IDs to be used in training and testing of the algorithm. Determined in `code/cp_data_subset/2_id_filter_cp.py`. 
+- 1_script_data: Includes files contained from scripts within `1_cp_data_subset`
+  - id_cp_shapefile.shp: Same file as `World_CPIS_2021` but IDs assigned to each center pivot. Used in `code/cp_data_subset/1_id_cp.py`
+  - cp_ids.txt: A list of CP IDs to be used in the training and testing of the algorithm. Determined in `code/cp_data_subset/2_id_filter_cp.py`.
+  - map.geojson: GeoJSON file containing a geometric shape of Africa and its coordinates. Used to subset `World_CPIS_2021` and for images.
+  - filtered_center_pivots.shp: Shapefile containing center pivots only within Africa. Filtered using the previous files in 
+    `code/cp_data_subset/3_data_subset.py`
+- 2_script_data: Includes files contained from scripts within `2_labeling_data`
+  - SSA_TIF_REQUEST: A folder containing all the TIF data obtained from Google Earth Engine in `1_gee_request.py`. This data is used to extract 
+    Landsat band info and create images that are used for labeling.
+  - Landsat_CP_images: A folder containing all of the images obtained from `2_cp_image_creator.py`. There is a JPEG for each type of image 
+    obtained (RGB, NDVI, LST) as well as a combined image containing all 3 which is in our labeling process.
+- 3_script_data: Includes files contained from scripts within `3_band_info_dataset`
+  - band_names.txt: A text file containing the band names for each TIF Image, used for reorganizing column names in our dataset to be in 
+    accordance with the band name rather than numerical index. Obtained from `1_band_names.py`.
+  - SSA_TIF_GEOJSONS: A folder containing all the bounding box coordinates obtained from `2_tif_gjsons.py`. These GeoJSONS are used to provide 
+    the general location of the center pivot, to then use our labeling data to pinpoint the exact lat/lon coordinates.
+  - tif_labels.json: JSON file containing our keypoint annotation data obtained from LabelStudio. Used from `3_bands_qa_unsplit.py` to extract 
+    data from the center pivots within our TIF images.
+  - 5LS_dataset.csv: Dataset containing Landsat band info, coordinates, and other data. Obtained by using our TIF images and annotation data in
+    `3_bands_qa_unsplit.py` and will later be prepared and modified before being used to train the classification model.
+  - 5Landsat_total_dataset.csv: Modified version of the previous script that is obtained from `4_dataset_columns`. This modified version 
+    reorganizes the data frame column names by their band name to avoid identical band indexes from providing different data.
+  - decoded_qa_bands.csv: Modified version of the previous dataset. It is obtained from `5_decode_qa_bands.py` and has altered QA columns that 
+    have been decoded to include a dictionary of information about the TIF image quality.
+  - filtered_no_clouds.csv: Modified version of the previous dataset which has been filtered to only include images that were not affected by 
+    clouds or cloud shadows. Obtained from `6_filter_cloud_data.py`
+  - bands_info_training.csv: Dataset that will be used to train the classification model. Is a random 70% split of `filtered_no_clouds.csv` but 
+    ensures that annotations from the same TIF are all included in the dataset. Obtained in `8_training_test_split.py`
+  - bands_info_test.csv: Dataset that will be used to test the classification model. Is a random 30% split of `filtered_no_clouds.csv` but 
+    ensures that annotations from the same TIF are all included in the dataset. This dataset will not be introduced to the model until after 
+    training to test the performance. Obtained in `8_training_test_split.py`
+- 4_script_images: Includes images/maps contained from scripts within `4_cross_validation_model`
+  - cv_bar_graph.png: PNG image of a bar graph showing the performance scores of the cross-validation.
+  - confusion_matrix.png: PNG image of a confusion matrix showing the models' correct and incorrect predictions
+  - regional_map.png: PNG image containing a map of Africa, showing performance by region via F-1 scores.
+  - new_ssa_map.png: PNG image containing a map of Africa that has the location of the center pivots plotted, showing correct/incorrect 
+    predictions for each center pivot.
+  - feature_performance.png: PNG image containing a bar graph conveying feature importance for our classification model, allowing us to see what 
+    features played a bigger role in helping predict activity status.
+  - four_season_map.png: PNG image containing 4 separate maps of Africa, each of the maps showcases the performance by region for each season of 
+    the year.
+
+ 
 
 ## Code Description
 
@@ -76,15 +116,29 @@ Because many of the data used in this project are too large to upload to GitHub,
     - Red, Green, and Blue (RGB). This is a regual visual representation of the image, which is what is actually loaded into LabelStudio for labeling. 
     - Normalized Difference Vegetation Index (NDVI). This image will allow us to see if there is vegetation on a given center pivot. 
     - Thermal infrared (TIR). Cooler temperatures signify that irrigation is likely.
-    - The final image is a combination of the RGB, NDVI, and LST images side by side, which is a helpful reference while labeling, allowing us to compare characteristics from all 3 images. 
+    - The final image is a combination of the RGB, NDVI, and LST images side by side, which is a helpful reference while labeling, allowing us to compare characteristics from all 3 images.
+
 
 3. Now that we have RGB Jpeg images for each TIF we upload our images to Label Studio. I labeled using 4 different keypoint labels: "Active CP", "Inactive CP", "No CP", "Cloud". I labeled using multiple keypoint labels per JPEG image. "Active CP" labels represent center pivots that had clear signs of irrigation or vegetation. This was determined through the side-by-side images produced in `2_cp_image_creator.py` which plot the National Vegetation Index and Land Surface Temperature. "Inactive CP" labels represent center pivots that were no longer in usage, or had signs of abandonment due to a lack of NDVI and LST. "No CP" labels represent surrounding areas of center pivots and were gathered to obtain additonal information on the surrounding areas of center pivots, making sure not to choose irrigated/vegetated areas. "Cloud" labels represent clouds found in the TIF images. These are obtained to provide additional information on images with large cloud coverage.
+
+## Example of labeling process
+# Label Key: Green-Active CP, Red-Inactive CP, Brown-No CP
+
+Key Factors in Label Decision Making:
+  -LST Image: Is the land surface temperature cool compared to the surrounding area? (Indicates water beneath the center pivot)
+  -NDVI Image: Are there indications of vegetation? (Center Pivots are used to irrigate crops)
+  -RGB Image: Identify the location within the image and determine if the Center Pivot look active, or abandoned? (Visual observations are 
+   helpful but the prior two are the key determiners)
+
+<img width="310" alt="Screen Shot 2024-05-31 at 3 34 15 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/b2d85a2f-c0af-435f-8664-bbeec9b9bfc5"> <img width="518" alt="Screen Shot 2024-05-31 at 3 42 00 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/9f062da1-b217-41d4-8ccf-6c13780f29f7">
+
+The image on the left is our combined JPEG image obtained from `2_cp_image_creator.py`. In order the images are RGB, Infrared (not used), NDVI, and LST. The right image represents the keypoint labels I made for this image based on our JPEG images. In this annotation, I created 2 Active labels. These labels were listed as Active because we can see visually that the center pivot is a darker brown than the surrounding areas and the LST image shows that they have a much cooler temperature as well. Even though there is only slight vegetation on these pivots, the other pieces of information still allow us to label these active considering there are stages where center pivots are active but don't have crops. The Inactive labels were determined as a result of the lack of vegetation and LST. When a center pivot is abandoned it is no longer being watered, thus causing land to become dry and similar to the surrounding area. For our No CP labels, it is important to avoid random areas of land that also contain a cooler LST than the surrounding areas. These labels are included to present data on the surrounding areas of the center pivot to showcase the difference between an irrigated center pivot and the surrounding areas.
 
 4. Once finished labeling you can submit your annotations to LabelStudio and export all your annotations into a JSON file. This JSON file includes the X and Y percentage of each label, allowing us to locate where in the TIF image the label is. It also includes information such as which file the annotation is from, allowing us to use our previous TIF files to extract band data on our keypoint labels.
 
 ## Extracting Band Data and Creating the 5 Landsat Dataset
 
-1. Now that we have a JSON file containing these annotations we must extract band data and write it into a csv. However, since we grabbed data from Landsats 4, 5, 7, 8, and 9, not all TIFS have the same band information. Landsat 4 and 5 have some bands that differentiate from the TIFS from Landsats 7, 8, and 9 so we must account for this in our dataset. The script `1_band_names.py` reads in your folder containing all the TIF Images and recieves the metadata description for each band. It writes these band names into a txt file containing band names for each TIF image.
+1. Now that we have a JSON file containing these annotations we must extract band data and write it into a csv. However, since we grabbed data from Landsats 4, 5, 7, 8, and 9, not all TIFS have the same band information. Landsat 4 and 5 have some bands that differentiate from the TIFS from Landsats 7, 8, and 9 so we must account for this in our dataset. The script `1_band_names.py` reads in your folder containing all the TIF Images and receives the metadata description for each band. It writes these band names into a txt file containing band names for each TIF image.
 
 2. Given that our JSON file from LabelStudio provides us with the X and Y percentage location of each keypoint label we can use this information to find out the latitude and longitude coordinates. `2_tif_gjsons.py` is a script that also reads in your TIF folder and produces a geojson containing the bounding box coordinates of the TIF. This series of geojsons will be saved to a folder named "SSA_TIF_GEOJSON" and 1 geojson will be produced for each TIF. Using the percentages from our JSON file and our bounding box coordinates we can calculate the exact position of each label.
 
