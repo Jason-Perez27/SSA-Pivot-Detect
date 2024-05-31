@@ -129,7 +129,7 @@ Because many of the data used in this project are too large to upload to GitHub,
 <img width="875" alt="Screen Shot 2024-05-22 at 4 47 31 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/c6db7e4a-f086-4515-82c9-3bd9d368483b">
 
 
-8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of SSA and uses the F-1 scores calculated during the cross-validation to show performance within the grids. The script uses grid cell size 2 for visible segmentations of the map.
+8. The script `6_region_perf.py` uses the stratification method used in `2_id_filter_cp.py` to divide our GeoJSON map of Africa and uses the F-1 scores calculated during the cross-validation to show performance within the grids. The script uses grid cell size 2 for visible segmentations of the map.
 
 <img width="817" alt="Screen Shot 2024-05-22 at 4 38 29 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/12ffe825-f332-4cd0-ae7d-91d8eba79263">
 
@@ -137,3 +137,6 @@ Because many of the data used in this project are too large to upload to GitHub,
 9. The script `7_seasonal_perf.py` analyzes the performance of the model by season. Giving the accuracy, precision, recall, and f-1 scores for each season.  
 <img width="194" alt="Screen Shot 2024-05-22 at 4 37 23 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/e11ba711-1779-4f37-8efe-50abc859e1cd"><img width="194" alt="Screen Shot 2024-05-22 at 4 37 05 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/bfe3178c-c06d-4f7c-a551-a102543534a7">
 
+10. Using the performance scores from `7_seasonal_perf.py`, to account for seasons varying across different parts of Africa, the script `8_seasonal_map.py` creates an image containing four different maps of Africa. There is one map corresponding to each season of the year and uses their F-1 scores to show performance by region using grid cells.
+
+![four_seaon_map](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/18989475-b3b4-47b0-828c-5f1292d03bd2)
