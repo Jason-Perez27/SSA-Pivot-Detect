@@ -130,8 +130,8 @@ Key Factors in Label Decision Making:
   -RGB Image: Identify the location within the image and determine if the Center Pivot look active, or abandoned? (Visual observations are 
    helpful but the prior two are the key determiners)
 
-<img width="1243" alt="Screen Shot 2024-05-31 at 4 02 40 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/87673ef0-d114-4736-8653-3456d93dba3f">
- <img width="518" alt="Screen Shot 2024-05-31 at 3 42 00 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/9f062da1-b217-41d4-8ccf-6c13780f29f7">
+<img width="1243" alt="Screen Shot 2024-05-31 at 4 02 40 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/87673ef0-d114-4736-8653-3456d93dba3f"> <img width="397" alt="Screen Shot 2024-05-31 at 4 06 13 PM" src="https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/95eebbb1-a6c5-449e-889c-d001aacc4508">
+
 
 The image on the left is our combined JPEG image obtained from `2_cp_image_creator.py`. In order the images are RGB, Infrared (not used), NDVI, and LST. The right image represents the keypoint labels I made for this image based on our JPEG images. In this annotation, I created 2 Active labels. These labels were listed as Active because we can see visually that the center pivot is a darker brown than the surrounding areas and the LST image shows that they have a much cooler temperature as well. Even though there is only slight vegetation on these pivots, the other pieces of information still allow us to label these active considering there are stages where center pivots are active but don't have crops. The Inactive labels were determined as a result of the lack of vegetation and LST. When a center pivot is abandoned it is no longer being watered, thus causing land to become dry and similar to the surrounding area. For our No CP labels, it is important to avoid random areas of land that also contain a cooler LST than the surrounding areas. These labels are included to present data on the surrounding areas of the center pivot to showcase the difference between an irrigated center pivot and the surrounding areas.
 
