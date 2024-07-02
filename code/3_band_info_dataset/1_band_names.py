@@ -2,10 +2,10 @@ import os
 import rasterio
 
 # Directory containing the TIF files
-tif_directory = '/Users/jasonperez/Downloads/SSA_TIF_REQUEST'
+tif_directory = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/SSA_TIF_REQUEST'
 
 # Output file path
-output_file_path = '/Users/jasonperez/Desktop/band_names.txt'
+output_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/band_names.txt'
 
 # Open the output file in write mode
 with open(output_file_path, 'w') as output_file:

@@ -24,8 +24,8 @@ def rescale_to_8bit(band_array, min_value=None, max_value=None):
     return band_array
 
 # Adjust file paths
-landsat_data_dir = 'data/World_CPIS_2021/SSA_TIF_REQUEST'
-output_jpeg_dir = 'data/World_CPIS_2021/Landsat_CP_Images'
+landsat_data_dir = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/SSA_TIF_REQUEST'
+output_jpeg_dir = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/Landsat_CP_Images'
 
 # Create the output directory if it does not exist
 if not os.path.exists(output_jpeg_dir):

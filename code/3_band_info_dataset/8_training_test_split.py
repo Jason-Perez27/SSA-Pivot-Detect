@@ -3,7 +3,7 @@ import os
 from sklearn.model_selection import GroupShuffleSplit
 
 # Load the CSV data
-csv_file = '/Users/jasonperez/filtered_no_clouds.csv'
+csv_file = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/filtered_no_clouds.csv'
 data = pd.read_csv(csv_file)
 
 
@@ -18,9 +18,8 @@ train_data = data.iloc[train_idx]
 test_data = data.iloc[test_idx]
 
 # Save the training and test data to separate CSV files on the desktop
-desktop_path = os.path.expanduser("~/Desktop")
-train_csv_file = os.path.join(desktop_path, 'bands_info_training.csv')
-test_csv_file = os.path.join(desktop_path, 'bands_info_test.csv')
+train_csv_file = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/3_script_data/bands_info_training.csv')
+test_csv_file = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/3_script_databands_info_test.csv')
 
 train_data.to_csv(train_csv_file, index=False)
 test_data.to_csv(test_csv_file, index=False)

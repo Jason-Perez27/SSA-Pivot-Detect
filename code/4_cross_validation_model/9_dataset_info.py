@@ -5,11 +5,16 @@ from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 # Load CSV file with training data
-csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/bands_info_training.csv'
+csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/filtered_no_clouds_label_id.csv'
 data = pd.read_csv(csv_file_path)
+
+# Check for any NaN values right after loading the data
+print("Initial NaN values in data:\n", data.isna().sum())
 
 # Exclude columns we don't want as features in our model
 excluded_columns = ['TIF Name', 'Pixel_QA', 'Cloud_QA', 'X Value', 'Y Value']
@@ -24,12 +29,19 @@ data = data.dropna(subset=['Label ID'])
 data.reset_index(drop=True, inplace=True)
 most_frequent_landsat = data['Landsat'].mode()[0]
 data['Landsat'].fillna(most_frequent_landsat, inplace=True)
+
+
 # Encode label using our "Label ID" column which holds a binary 0 or 1 value
 label_encoder = LabelEncoder()
 data['Encoded Label'] = label_encoder.fit_transform(data['Label ID'])
+label_data = data['Label'].copy()
 
 # Exclude the Label column which holds a string
 data = data.drop(columns=excluded_columns + ['Label'])
+
+# Determine what features correlate to the labels
+correlations = data.corr()
+print("Correlations with Encoded Label:\n", correlations['Encoded Label'].sort_values(ascending=False))
 
 # Define features and target
 X = data.drop(columns=['Encoded Label', 'Label ID'])
@@ -41,6 +53,8 @@ longitude = data['X-Coord']
 X['Latitude'] = latitude
 X['Longitude'] = longitude
 
+# Check for NaN values after adjusting lat/lon features
+print("NaN values after handling lat/long:\n", X.isna().sum())
 
 # Calculate additional vegetation indices to check for vegeatation on the keypoint annotation
 X['EVI'] = 2.5 * (X['Near_Infrared'] - X['Red']) / (X['Near_Infrared'] + 6 * X['Red'] - 7.5 * X['Blue'] + 1)
@@ -94,7 +108,8 @@ lst_values_swa_TIRS = calculate_lst_swa_TIRS(TIRS1, TIRS2)
 X['LST_SWA_TIRS'] = lst_values_swa_TIRS
 lst_values_swa_thermal = calculate_lst_swa_thermal(thermal_value)
 X['LST_SWA_THERMAL'] = lst_values_swa_thermal
-
+# Check for NaN values before model fitting
+print("NaN values before model fitting:\n", X.isna().sum())
 
 # Define the groups based on the first column of the CSV file
 groups = data.iloc[:, 0]
@@ -144,26 +159,44 @@ adjusted_predictions = [(prob >= float(threshold)).astype(int) for prob in predi
 # Convert predicted labels back to original class labels
 predicted_labels = label_encoder.inverse_transform(adjusted_predictions)
 
-class_names = ['Inactive/No CP', 'Active CP']
+# Generate and print the classification report
+report = classification_report(true_labels, predicted_labels, labels=label_encoder.classes_, zero_division='warn')
 
-# Generate the classification report with output_dict to get the report in a dictionary form
-report_dict = classification_report(true_labels, predicted_labels, labels=label_encoder.classes_, target_names=class_names, output_dict=True, zero_division=0)
+print(report)
 
-# Convert the report dictionary to a DataFrame so that we can use MatPlotLib to create a visual bar graph
-report_df = pd.DataFrame(report_dict).transpose()
+feature_importances = classifier.feature_importances_
+sorted_indices = np.argsort(feature_importances)[::-1]
+print("Feature Importances:")
+for idx in sorted_indices:
+    print(f"{X.columns[idx]}: {feature_importances[idx]}")
 
-# Remove the support column from our report
-report_df = report_df.drop(columns=['support']).iloc[:-3]
+# Visualizations
+# Get the value counts of the 'Landsat' column
+landsat_counts = data['Landsat'].value_counts()
+landsat_counts = landsat_counts.sort_index()
 
-# Convert columns to float for plotting
-report_df = report_df.astype(float)
+# Bar plot of how many observations of each label category we have
+label_data.value_counts().plot(kind='bar', title='Observations per Label Category')
+plt.xlabel('Label')
+plt.ylabel('Count')
+plt.show()
 
-# Plot the bar graph
-plt.figure(figsize=(10, 6))
-report_df.plot(kind='bar', figsize=(12, 8))
-plt.title('Classification Metrics for Each Class')
-plt.ylabel('Score')
-plt.xlabel('Class')
-plt.legend(title='Metrics', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.tight_layout()
+
+# Bar plot of how many observations from each Landsat we have
+plt.figure(figsize=(10, 6))  
+plt.bar(landsat_counts.index.astype(str), landsat_counts.values)  
+plt.title('Observations per Landsat')
+plt.xlabel('Landsat')
+plt.ylabel('Count')
+plt.xticks(rotation=45)  
+plt.show()
+
+# Bar plot of how many observations from each month we have
+month_counts = data['Month'].value_counts().sort_index()
+plt.figure(figsize=(10, 6))  
+plt.bar(month_counts.index.astype(str), month_counts.values) 
+plt.title('Observations per Month')
+plt.xlabel('Month')
+plt.ylabel('Count')
+plt.xticks(rotation=45)  
 plt.show()

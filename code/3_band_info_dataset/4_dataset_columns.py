@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Path to the CSV file
-csv_file_path = '/Users/jasonperez/5Landsat_total_data.csv'
+csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/5Landsat_total_data.csv'
 
 # Load the CSV file into a DataFrame
 df = pd.read_csv(csv_file_path)

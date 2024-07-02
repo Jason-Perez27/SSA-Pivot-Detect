@@ -4,10 +4,10 @@ import json
 from pyproj import Transformer
 
 # Directory containing the TIF files
-tif_directory = '/Users/jasonperez/Desktop/SSA_TIF_REQUEST'
+tif_directory = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/SSA_TIF_REQUEST'
 
 # Output directory for the GeoJSON files
-geojson_directory = '/Users/jasonperez/Desktop/SSA_TIF_GEOJSON/'  
+geojson_directory = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/SSA_TIF_GEOJSON/'  
 
 
 os.makedirs(geojson_directory, exist_ok=True)

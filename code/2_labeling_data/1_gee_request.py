@@ -65,6 +65,6 @@ class LandsatDataExporter:
             task.start()
 
 # Usage
-shapefile_path = 'data/World_CPIS_2021/filtered_center_pivots.shp'
+shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/1_script_data/filtered_center_pivots.shp'
 exporter = LandsatDataExporter(shapefile_path)
 exporter.export_landsat_data()

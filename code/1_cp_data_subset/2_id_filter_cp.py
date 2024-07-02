@@ -6,11 +6,11 @@ import random
 random.seed(42)
 
 # Input paths
-shapefile_path = os.path.join('data/World_CPIS_2021/id_cp_shapefile.shp')
-ssa_geojson_path = 'data/map.geojson'
+shapefile_path = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/1_script_data/id_cp_shapefile.shp')
+ssa_geojson_path = '/home/waves/data/SSA-Pivot-Detect/data/1_script_data/map.geojson'
 
 # Output file path
-output_txt_file_path = os.path.join('data/cp_ids.txt')
+output_txt_file_path = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/1_script_data/cp_ids.txt')
 
 # Read data
 original_cp_gdf = gpd.read_file(shapefile_path)

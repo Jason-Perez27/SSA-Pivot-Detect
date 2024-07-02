@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import f1_score
 
 # Load CSV file with training data
-csv_file_path = '/Users/jasonperez/Desktop/bands_info_training.csv'
+csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/bands_info_training.csv'
 data = pd.read_csv(csv_file_path)
 
 # Exclude columns we don't want as features in our model
@@ -26,7 +26,8 @@ data['TIRS2'].fillna(0, inplace=True)
 data['Landsat'] = data['Landsat'].astype('category')
 data = data.dropna(subset=['Label ID'])
 data.reset_index(drop=True, inplace=True)
-
+most_frequent_landsat = data['Landsat'].mode()[0]
+data['Landsat'].fillna(most_frequent_landsat, inplace=True)
 # Encode label using our "Label ID" column which holds a binary 0 or 1 value
 label_encoder = LabelEncoder()
 data['Encoded Label'] = label_encoder.fit_transform(data['Label ID'])

@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the CSV file into a DataFrame
-csv_file_path = '/Users/jasonperez/5Landsat_total_data.csv'
+csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/5Landsat_total_data.csv'
 df = pd.read_csv(csv_file_path)
 
 qa_columns = ['Cloud_QA', 'Pixel_QA']
@@ -43,4 +43,4 @@ def decode_qa_bands(row):
 df = df.apply(decode_qa_bands, axis=1)
 
 # Save the updated DataFrame back to CSV
-df.to_csv('decoded_qa_bands.csv', index=False)
+df.to_csv('/home/waves/data/SSA-Pivot-Detect/data/3_script_data/decoded_qa_bands.csv', index=False)

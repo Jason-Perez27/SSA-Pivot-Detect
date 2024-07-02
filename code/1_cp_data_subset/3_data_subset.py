@@ -2,11 +2,11 @@ import os
 import geopandas as gpd
 
 # Input paths
-shapefile_path = 'data/World_CPIS_2021/id_cp_shapefile.shp'
-txt_file_path = os.path.join('data/cp_ids.txt')
+shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/1_script_data/id_cp_shapefile.shp'
+txt_file_path = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/1_script_data/cp_ids.txt')
 
 # Output file path
-output_shapefile_path = os.path.join('data/World_CPIS_2021/filtered_center_pivots.shp')
+output_shapefile_path = os.path.join('/home/waves/data/SSA-Pivot-Detect/data/1_script_data/filtered_center_pivots.shp')
 
 # Read the IDs from the text file
 with open(txt_file_path, 'r') as f:

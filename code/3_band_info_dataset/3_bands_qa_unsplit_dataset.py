@@ -4,7 +4,7 @@ import csv
 import os
 
 # Step 1: Read JSON File
-json_file_path = '/Users/jasonperez/Desktop/tif_labels.json'
+json_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/tif_labels.json'
 with open(json_file_path, 'r') as json_file:
     annotations_data = json.load(json_file)
 
@@ -23,7 +23,7 @@ for annotation in annotations_data:
 
 # Step 3: Read the band names from the text file
 band_names = {}
-with open('/Users/jasonperez/Desktop/band_names.txt', 'r') as band_names_file:
+with open('/home/waves/data/SSA-Pivot-Detect/data/3_script_data/band_names.txt', 'r') as band_names_file:
     current_tif_name = None
     for line in band_names_file:
         if line.startswith('Band names for '):
@@ -33,7 +33,7 @@ with open('/Users/jasonperez/Desktop/band_names.txt', 'r') as band_names_file:
             band_names[current_tif_name].append(line.split(': ')[1].strip())
 
 # Step 4: Prepare CSV file
-csv_file_path = '/Users/jasonperez/Desktop/5LS_dataset.csv'
+csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/5LS_dataset.csv'
 # Add 'Month', 'Year', and 'TIF ID' to the csv_columns list
 csv_columns = ['TIF ID', 'TIF Name', 'Landsat', 'Year', 'Month', 'X Value', 'Y Value', 'Label', 'X-Coord', 'Y-Coord','B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'sr_aerosol', 'sr_atmos_opacity', 'sr_cloud_qa', 'pixel_qa', 'radsat_qa']
 
@@ -42,8 +42,8 @@ with open(csv_file_path, 'w', newline='') as csv_file:
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow(csv_columns)
 
-    tif_folder = '/Users/jasonperez/Desktop/SSA_TIF_REQUEST'
-    geojson_folder = '/Users/jasonperez/Desktop/SSA_TIF_GEOJSON'
+    tif_folder = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/SSA_TIF_REQUEST'
+    geojson_folder = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/SSA_TIF_GEOJSON'
     for clean_filename, annotation in image_to_annotation.items():
         tif_file_path = f'{tif_folder}/{clean_filename}'
         with rasterio.open(tif_file_path) as src:
