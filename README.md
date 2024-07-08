@@ -202,3 +202,16 @@ The image on the top is our combined JPEG image obtained from `2_cp_image_creato
 ![observation_landsat](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/8b43ec2e-56b8-4e8d-8d67-036eb702daa6)
 ![observations_label](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/e053330c-3d2f-4c4f-be35-f7dafef77a8b)
 ![observations_month](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/412aaa9a-771e-4599-a7ed-3f85df4b1cfb)
+
+12. Our script `10_combined_matrix.py` produces an image conveying the model's predictions for each of our subclass labels. Since we already know that subclasses "No CP' and "Inactive CP" are representations of "non-irrigated land" and the subclasses "Active CP" and "No CP Irrigated" represent "irrigated land", we can use this image to analyze the number of correct and incorrect predictions per subclass label.
+![combined_matrix](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/a2bff999-1e6f-4ac4-b859-78b937ed2cc2)
+
+13. The script `11_label_graph.py` produces 3 separate bar graph images to show our model's performance regarding subclass label accuracy, f-1 score by different Landsat, and f-1 score  by month.
+# Accuracy Score by Subclass Label
+![label_graph](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/f327c5a4-f1d9-4d16-839f-8c4563733803)
+
+# F-1 Score per Landsat Type
+![landsat_graph_bar](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/3e6e9abf-a04c-4f17-b1ce-7e6b8ebceb10)
+
+# F-1 Score Per Month
+![month_graph](https://github.com/Jason-Perez27/SSA-Pivot-Detect/assets/137958043/f378fd05-360c-4113-bcc0-73f8cd55d9d5)
