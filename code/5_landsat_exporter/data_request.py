@@ -6,8 +6,11 @@ import re
 import time
 import logging
 
-# Initialize the Earth Engine API.
-ee.Initialize()
+# Trigger the authentication flow.
+ee.Authenticate()
+
+# Initialize the library.
+ee.Initialize(project='center-pivots')
 
 # Setup logging
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
