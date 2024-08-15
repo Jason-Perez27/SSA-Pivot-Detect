@@ -21,10 +21,10 @@ class LandsatDataExporter:
         self.center_pivot_gdf = gpd.read_file(self.shapefile_path)
         self.max_tasks = max_tasks
         self.landsat_collections = {
-            'LANDSAT/LT04/C01/T1_L2': (1982, 1993, 'Landsat 4'),
-            'LANDSAT/LT05/C01/T1_L2': (1984, 2012, 'Landsat 5'),
-            'LANDSAT/LC08/C01/T1_L2': (2013, 2021, 'Landsat 8'),
-            'LANDSAT/LE07/C01/T1_L2': (1999, 2022, 'Landsat 7'),
+            'LANDSAT/LT04/C01/T1_SR': (1982, 1993, 'Landsat 4'),
+            'LANDSAT/LT05/C01/T1_SR': (1984, 2012, 'Landsat 5'),
+            'LANDSAT/LC08/C01/T1_SR': (2013, 2021, 'Landsat 8'),
+            'LANDSAT/LE07/C01/T1_SR': (1999, 2022, 'Landsat 7'),
             'LANDSAT/LC09/C01/T1_L2': (2021, 2023, 'Landsat 9')
         }
 
