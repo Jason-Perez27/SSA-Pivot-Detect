@@ -3,6 +3,9 @@ import geopandas as gpd
 import os
 import logging
 import time
+import re
+import json
+
 # Trigger the authentication flow.
 ee.Authenticate()
 
@@ -13,10 +16,12 @@ ee.Initialize(project='center-pivots')
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 class LandsatDataExporter:
-    def __init__(self, shapefile_path, max_tasks=50):
+    def __init__(self, shapefile_path, max_tasks=50, progress_file='export_progress.json'):
         self.shapefile_path = os.path.expanduser(shapefile_path)
         self.center_pivot_gdf = gpd.read_file(self.shapefile_path)
         self.max_tasks = max_tasks
+        self.progress_file = progress_file
+        self.progress = self.load_progress()
         self.landsat_collections = {
             'LANDSAT/LT04/C02/T1_L2': (1982, 1993, 'Landsat 4'),
             'LANDSAT/LT05/C02/T1_L2': (1984, 2012, 'Landsat 5'),
@@ -25,21 +30,42 @@ class LandsatDataExporter:
             'LANDSAT/LC09/C02/T1_L2': (2021, 2023, 'Landsat 9')
         }
 
+    def load_progress(self):
+        if not os.path.exists(self.progress_file):
+            # Create an empty JSON file if it doesn't exist
+            with open(self.progress_file, 'w') as f:
+                json.dump({}, f)
+            return {}
+        
+        with open(self.progress_file, 'r') as f:
+            return json.load(f)
+
+    def save_progress(self):
+        with open(self.progress_file, 'w') as f:
+            json.dump(self.progress, f)
+
     def clean_description(self, desc):
         cleaned_desc = re.sub(r'[^a-zA-Z0-9.,:;_-]', '_', desc)
         return cleaned_desc[:100]
 
     def export_landsat_data(self):
         for index, row in self.center_pivot_gdf.iterrows():
+            pivot_id = row['ID']
+            if pivot_id not in self.progress:
+                self.progress[pivot_id] = {}
+            
             for collection_path, (start_year, end_year, landsat_name) in self.landsat_collections.items():
-                if self.check_active_tasks() < self.max_tasks:
-                    try:
-                        self.export_pivot(row, collection_path, start_year, end_year, landsat_name)
-                    except Exception as e:
-                        logging.error(f'Failed to process pivot {row["ID"]}: {str(e)}')
-                else:
-                    logging.info("Max tasks reached, waiting...")
-                    time.sleep(600)  
+                if landsat_name not in self.progress[pivot_id]:
+                    if self.check_active_tasks() < self.max_tasks:
+                        try:
+                            self.export_pivot(row, collection_path, start_year, end_year, landsat_name)
+                            self.progress[pivot_id][landsat_name] = 'completed'
+                            self.save_progress()
+                        except Exception as e:
+                            logging.error(f'Failed to process pivot {pivot_id} for {landsat_name}: {str(e)}')
+                    else:
+                        logging.info("Max tasks reached, waiting...")
+                        time.sleep(600)
 
     def export_pivot(self, row, collection_path, start_year, end_year, landsat_name):
         geom = row['geometry']
@@ -77,7 +103,11 @@ class LandsatDataExporter:
         running_tasks = [task for task in tasks if task.state in ['RUNNING', 'READY']]
         return len(running_tasks)
 
+    def resume_export(self):
+        logging.info("Resuming export from last saved progress")
+        self.export_landsat_data()
+
 # Usage
-shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/combined_CPIS/combined_CPIS.shp'
+shapefile_path = 'c:/Users/jdper/Desktop/SSA-Pivot-Detect-Local/data/combined_CPIS.shp'
 exporter = LandsatDataExporter(shapefile_path)
-exporter.export_landsat_data()
+exporter.resume_export()
