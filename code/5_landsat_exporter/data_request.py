@@ -10,7 +10,7 @@ import json
 ee.Authenticate()
 
 # Initialize the library.
-ee.Initialize(project='center-pivots')
+ee.Initialize(project='center-pivot-collection2')
 
 # Setup logging
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
@@ -74,21 +74,31 @@ class LandsatDataExporter:
                       .filterDate(f'{start_year}-01-01', f'{end_year}-12-31')\
                       .filterBounds(ee_geom)\
                       .filter(ee.Filter.lt('CLOUD_COVER', 10))
-        scaled = collection.map(self.apply_scale_factors)
-        masked = scaled.map(self.qa_mask)
-        pivot_id = row['ID']
-        description = f'CenterPivot_{pivot_id}_{landsat_name}_TimeSeries'
-        export_options = {
-            'image': masked.median().toFloat(),
-            'description': self.clean_description(description),
-            'folder': 'TOTAL_TIF_REQUEST',
-            'scale': 30,
-            'region': ee_geom,
-            'maxPixels': 10000000000000
-        }
-        task = ee.batch.Export.image.toDrive(**export_options)
-        task.start()
-        logging.info(f'Started export task for pivot {pivot_id} for {landsat_name} time series')
+        
+        image_count = collection.size().getInfo()
+        
+        if image_count > 0:
+            images = collection.toList(image_count)
+            for i in range(image_count):
+                image = ee.Image(images.get(i))
+                image_date = ee.Date(image.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+                scaled = self.apply_scale_factors(image)
+                masked = self.qa_mask(scaled)
+                pivot_id = row['ID']
+                description = f'CenterPivot_{pivot_id}_{landsat_name}_{image_date}'
+                export_options = {
+                    'image': masked.toFloat(),
+                    'description': self.clean_description(description),
+                    'folder': 'TOTAL_TIF_REQUEST',
+                    'scale': 30,
+                    'region': ee_geom,
+                    'maxPixels': 10000000000000
+                }
+                task = ee.batch.Export.image.toDrive(**export_options)
+                task.start()
+                logging.info(f'Started export task for pivot {pivot_id} for {landsat_name}, image date: {image_date}')
+        else:
+            logging.info(f'No images found for pivot {row["ID"]} in {landsat_name} collection')
 
     def apply_scale_factors(self, image):
         optical_bands = image.select('SR_B.*').multiply(0.0000275).add(-0.2)

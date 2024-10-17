@@ -4,12 +4,13 @@ import os
 import logging
 import time
 import re
+from datetime import datetime
 
 # Trigger the authentication flow.
 ee.Authenticate()
 
 # Initialize the library.
-ee.Initialize(project='center-pivots')
+ee.Initialize(project='center-pivot-collection2')
 
 # Setup logging
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
@@ -32,18 +33,6 @@ class LandsatDataExporter:
         cleaned_desc = re.sub(r'[^a-zA-Z0-9.,:;_-]', '_', desc)
         return cleaned_desc[:100]
 
-    def export_landsat_data(self):
-        for file in os.listdir(self.tif_folder):
-            if file.endswith('.tif'):
-                pivot_id, year, month, landsat = self.parse_filename(file)
-                if pivot_id and year and month and landsat:
-                    row = self.center_pivot_gdf[self.center_pivot_gdf['ID'] == pivot_id].iloc[0]
-                    if self.check_active_tasks() < self.max_tasks:
-                        self.export_pivot(row, year, month, landsat, file)
-                    else:
-                        logging.info("Max tasks reached, waiting...")
-                        time.sleep(600)
-
     def parse_filename(self, filename):
         parts = filename.split('_')
         if len(parts) >= 5:
@@ -51,10 +40,23 @@ class LandsatDataExporter:
             year = parts[2]
             month = parts[3]
             landsat = parts[4].split('.')[0]
-            return pivot_id, year, month, landsat
-        return None, None, None, None
+            date = f"{year}-{month}-01"
+            return pivot_id, date, landsat, year, month
+        return None, None, None, None, None
 
-    def export_pivot(self, row, year, month, landsat, original_filename):
+    def export_landsat_data(self):
+        for file in os.listdir(self.tif_folder):
+            if file.endswith('.tif'):
+                pivot_id, date, landsat = self.parse_filename(file)
+                if pivot_id and date and landsat:
+                    row = self.center_pivot_gdf[self.center_pivot_gdf['ID'] == pivot_id].iloc[0]
+                    if self.check_active_tasks() < self.max_tasks:
+                        self.export_pivot(row, date, landsat)
+                    else:
+                        logging.info("Max tasks reached, waiting...")
+                        time.sleep(600)
+
+    def export_pivot(self, row, date, landsat, year, month):
         geom = row['geometry']
         ee_geom = ee.Geometry(geom.__geo_interface__)
         collection_path = self.landsat_collections.get(landsat)
@@ -63,8 +65,11 @@ class LandsatDataExporter:
             logging.warning(f"No Landsat collection found for {landsat}")
             return
 
+        start_date = ee.Date(date)
+        end_date = start_date.advance(1, 'month')
+
         collection = ee.ImageCollection(collection_path)\
-                      .filterDate(f"{year}-{month}-01", f"{year}-{month}-31")\
+                      .filterDate(start_date, end_date)\
                       .filterBounds(ee_geom)\
                       .filter(ee.Filter.lt('CLOUD_COVER', 10))
 
@@ -73,9 +78,10 @@ class LandsatDataExporter:
             scaled = self.apply_scale_factors(image)
             masked = self.qa_mask(scaled)
             pivot_id = row['ID']
+            description = f'CenterPivot_{pivot_id}_{year}_{month}_{landsat}_collection2'
             export_options = {
                 'image': masked.toFloat(),
-                'description': self.clean_description(original_filename.split('.')[0]),
+                'description': self.clean_description(description),
                 'folder': 'COLLECTION2_TIF_REQUEST',
                 'scale': 30,
                 'region': ee_geom,
@@ -83,9 +89,9 @@ class LandsatDataExporter:
             }
             task = ee.batch.Export.image.toDrive(**export_options)
             task.start()
-            logging.info(f'Started export task for {original_filename}')
+            logging.info(f'Started export task for pivot {pivot_id} for {landsat} on {date}')
         else:
-            logging.info(f'No image found for {original_filename}')
+            logging.info(f'No image found for pivot {row["ID"]} on {date}')
 
     def apply_scale_factors(self, image):
         optical_bands = image.select('SR_B.*').multiply(0.0000275).add(-0.2)
@@ -100,8 +106,9 @@ class LandsatDataExporter:
         running_tasks = [task for task in tasks if task.state in ['RUNNING', 'READY']]
         return len(running_tasks)
 
+
 # Usage
-shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/combined_CPIS/combined_CPIS.shp'
-tif_folder = '/home/waves/data/SSA-Pivot-Detect/data/Data_collection_2_request'
+shapefile_path = 'c:/Users/jdper/Desktop/SSA-Pivot-Detect-Local/data/combined_CPIS.shp'
+tif_folder = 'c:/Users/jdper/Desktop/SSA_Filtered_CP_Tifs_5'
 exporter = LandsatDataExporter(shapefile_path, tif_folder)
 exporter.export_landsat_data()
