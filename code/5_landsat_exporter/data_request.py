@@ -6,17 +6,18 @@ import time
 import re
 import json
 
-# Trigger the authentication flow.
-ee.Authenticate()
-
-# Initialize the library.
-ee.Initialize(project='center-pivot-collection2')
-
 # Setup logging
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 class LandsatDataExporter:
-    def __init__(self, shapefile_path, max_tasks=50, progress_file='export_progress.json'):
+    def __init__(self, shapefile_path, service_account_key_path, max_tasks=50, progress_file='export_progress.json'):
+        # Initialize with service account
+        credentials = ee.ServiceAccountCredentials(
+            'gee-export-service@center-pivot-collection2.iam.gserviceaccount.com',
+            service_account_key_path
+        )
+        ee.Initialize(credentials)
+        
         self.shapefile_path = os.path.expanduser(shapefile_path)
         self.center_pivot_gdf = gpd.read_file(self.shapefile_path)
         self.max_tasks = max_tasks
@@ -29,7 +30,6 @@ class LandsatDataExporter:
             'LANDSAT/LE07/C02/T1_L2': (1999, 2022, 'Landsat 7'),
             'LANDSAT/LC09/C02/T1_L2': (2021, 2023, 'Landsat 9')
         }
-
     def load_progress(self):
         if not os.path.exists(self.progress_file):
             # Create an empty JSON file if it doesn't exist
@@ -89,7 +89,7 @@ class LandsatDataExporter:
                 export_options = {
                     'image': masked.toFloat(),
                     'description': self.clean_description(description),
-                    'folder': 'TOTAL_TIF_REQUEST',
+                    'folder': 'time_series_landsat_data',
                     'scale': 30,
                     'region': ee_geom,
                     'maxPixels': 10000000000000
@@ -118,6 +118,7 @@ class LandsatDataExporter:
         self.export_landsat_data()
 
 # Usage
-shapefile_path = 'c:/Users/jdper/Desktop/SSA-Pivot-Detect-Local/data/combined_CPIS.shp'
-exporter = LandsatDataExporter(shapefile_path)
-exporter.resume_export()
+shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/World_CPIS_2021/combined_CPIS.shp'
+service_account_key_path = '/home/waves/data/SSA-Pivot-Detect/center-pivots-collection2-1408cb0e7b9f.json'
+exporter = LandsatDataExporter(shapefile_path, service_account_key_path)
+exporter.export_landsat_data()

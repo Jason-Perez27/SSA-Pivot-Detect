@@ -6,17 +6,18 @@ import time
 import re
 from datetime import datetime
 
-# Trigger the authentication flow.
-ee.Authenticate()
-
-# Initialize the library.
-ee.Initialize(project='center-pivot-collection2')
-
 # Setup logging
 logging.basicConfig(filename='exporter.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 class LandsatDataExporter:
-    def __init__(self, shapefile_path, tif_folder, max_tasks=50):
+    def __init__(self, shapefile_path, tif_folder, service_account_key_path, max_tasks=50):
+        # Initialize with service account
+        credentials = ee.ServiceAccountCredentials(
+            service_account='gee-export-service@center-pivot-collection2.iam.gserviceaccount.com',
+            private_key_file=service_account_key_path
+        )
+        ee.Initialize(credentials)
+        
         self.shapefile_path = os.path.expanduser(shapefile_path)
         self.center_pivot_gdf = gpd.read_file(self.shapefile_path)
         self.tif_folder = tif_folder
@@ -82,7 +83,7 @@ class LandsatDataExporter:
             export_options = {
                 'image': masked.toFloat(),
                 'description': self.clean_description(description),
-                'folder': 'COLLECTION2_TIF_REQUEST',
+                'folder': 'collection2_landsat_data',
                 'scale': 30,
                 'region': ee_geom,
                 'maxPixels': 10000000000000
@@ -108,7 +109,8 @@ class LandsatDataExporter:
 
 
 # Usage
-shapefile_path = 'c:/Users/jdper/Desktop/SSA-Pivot-Detect-Local/data/combined_CPIS.shp'
-tif_folder = 'c:/Users/jdper/Desktop/SSA_Filtered_CP_Tifs_5'
-exporter = LandsatDataExporter(shapefile_path, tif_folder)
+shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/World_CPIS_2021/combined_CPIS.shp'
+tif_folder = '/home/waves/data/SSA-Pivot-Detect/data/Data_collection_2_request'
+service_account_key_path = '/home/waves/data/SSA-Pivot-Detect/center-pivots-collection2-1408cb0e7b9f.json'
+exporter = LandsatDataExporter(shapefile_path, tif_folder, service_account_key_path)
 exporter.export_landsat_data()
