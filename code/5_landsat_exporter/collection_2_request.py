@@ -76,10 +76,20 @@ class LandsatDataExporter:
 
         if collection.size().getInfo() > 0:
             image = collection.first()
+            
+            # Get the exact date from the image
+            image_date = ee.Date(image.get('system:time_start')).format('YYYY-MM-dd').getInfo()
+            year = image_date.split('-')[0]
+            month = image_date.split('-')[1]
+            day = image_date.split('-')[2]
+        
             scaled = self.apply_scale_factors(image)
             masked = self.qa_mask(scaled)
             pivot_id = row['ID']
-            description = f'CenterPivot_{pivot_id}_{year}_{month}_{landsat}_collection2'
+            
+            # Include day in the description
+            description = f'CenterPivot_{pivot_id}_{year}_{month}_{day}_{landsat}_collection2'
+            
             export_options = {
                 'image': masked.toFloat(),
                 'description': self.clean_description(description),
@@ -90,7 +100,7 @@ class LandsatDataExporter:
             }
             task = ee.batch.Export.image.toDrive(**export_options)
             task.start()
-            logging.info(f'Started export task for pivot {pivot_id} for {landsat} on {date}')
+            logging.info(f'Started export task for pivot {pivot_id} for {landsat} on {image_date}')
         else:
             logging.info(f'No image found for pivot {row["ID"]} on {date}')
 
