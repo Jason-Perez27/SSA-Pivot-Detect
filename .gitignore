@@ -3,4 +3,4 @@ data/*
 */.DS_Store
 .DS_Store
 
-exporter.log
+*.log
