@@ -42,9 +42,9 @@ class LandsatDataExporter:
         # Setup logging
         logging.basicConfig(filename=log_name, level=logging.INFO, format='%(asctime)s %(message)s')
 
-        # Set default for pivot_ids to all IDs in the GeoDataFrame
+        # Set default for pivot_ids to all Ids in the GeoDataFrame
         if pivot_ids is None:
-            pivot_ids = self.center_pivot_gdf['ID'].tolist()
+            pivot_ids = self.center_pivot_gdf['Id'].tolist()
         
         # remove the completed pivots from the list of pivots to download if a file with completed pivots is provided
         if completed_pivot_file:
@@ -60,7 +60,7 @@ class LandsatDataExporter:
         for index, pivot_id in enumerate(pivot_ids): 
 
             # Retrive the center pivot geometry and buffer it if necessary:
-            row = self.center_pivot_gdf[self.center_pivot_gdf['ID'] == pivot_id].iloc[0]
+            row = self.center_pivot_gdf[self.center_pivot_gdf['Id'] == pivot_id].iloc[0]
             geom = row['geometry']
             if buffer:
                 buffer_distance = 1000 / 100000
@@ -136,7 +136,7 @@ class LandsatDataExporter:
                             task.start()
                             logging.info(f'Started export task for pivot {pivot_id} for {landsat_name}, image date: {image_date}')
                 
-                logging.info(f'Finished downloading images for pivot {pivot_id} in {landsat_name} collection between {start_date} and {end_date}')
+                    logging.info(f'Finished downloading images for pivot {pivot_id} in {landsat_name} collection between {start_date} and {end_date}')
             
             logging.info(f'Finished downloading images for pivot {pivot_id}')
             
@@ -172,9 +172,9 @@ if __name__ == '__main__':
     exporter = LandsatDataExporter(shapefile_path, drive_folder, service_account, service_account_key_path)
 
     # Test downloading data for training
-    exporter.download(log_name='c2_training_test.log', pivot_ids=[1,992], months=[6,4], years=[2017,2014], landsats=[8,8], buffer=True, max_cloud_cover=10) # The first one should fail and continue to the next one
+    exporter.download(log_name='c2_training_test.log', pivot_ids=[277,992], months=[6,4], years=[2017,2014], landsats=[8,8], buffer=True, max_cloud_cover=10)
 
     # Test downloading the full time series
-    exporter.download(log_name='c2_time_series_test.log', pivot_ids=[1, 100], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
+    exporter.download(log_name='c2_time_series_test.log', pivot_ids=[277,992], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
     # Check if it skips over the pivots that are already downloaded
-    exporter.download(log_name='c2_time_series_test.log', pivot_ids=[100, 200], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
+    exporter.download(log_name='c2_time_series_test.log', pivot_ids=[277,327], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
