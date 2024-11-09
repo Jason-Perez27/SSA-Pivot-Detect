@@ -104,7 +104,7 @@ class LandsatDataExporter:
                         if months is not None and years is not None: 
                             image_count = 1
 
-                        logging.info(f'Starting download for {image_count} images for pivot {pivot_id} in {landsat_name} collection between {start_date} and {end_date}')
+                        logging.info(f'Starting download for {image_count} images for pivot {pivot_id} in {landsat_name} collection between {start_date.format("YYYY-MM-dd").getInfo()} and {end_date.format("YYYY-MM-dd").getInfo()}')
 
                         # Download the images to Google Drive
                         images = collection.toList(image_count)
@@ -138,7 +138,7 @@ class LandsatDataExporter:
                             task.start()
                             logging.info(f'Started export task for pivot {pivot_id} for {landsat_name}, image date: {image_date}')
                 
-                    logging.info(f'Finished downloading images for pivot {pivot_id} in {landsat_name} collection between {start_date} and {end_date}')
+                    logging.info(f'Finished downloading images for pivot {pivot_id} in {landsat_name} collection between {start_date.format("YYYY-MM-dd").getInfo()} and {end_date.format("YYYY-MM-dd").getInfo()}')
             
             logging.info(f'Finished downloading images for pivot {pivot_id}')
             
