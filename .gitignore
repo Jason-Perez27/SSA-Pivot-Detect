@@ -4,3 +4,6 @@ data/*
 .DS_Store
 
 *.log
+
+completed_pivots_test.txt
+completed_pivots.txt

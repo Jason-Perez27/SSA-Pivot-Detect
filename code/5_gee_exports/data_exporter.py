@@ -3,8 +3,7 @@ import geopandas as gpd
 import os
 import logging
 import time
-import re
-import json
+import random
 
 class LandsatDataExporter:
     def __init__(self, shapefile_path, drive_folder, service_account, service_account_key_path, max_tasks=50):
@@ -45,6 +44,7 @@ class LandsatDataExporter:
         # Set default for pivot_ids to all Ids in the GeoDataFrame
         if pivot_ids is None:
             pivot_ids = self.center_pivot_gdf['Id'].tolist()
+            random.shuffle(pivot_ids) # shuffle the pivots so that we have a random sample even if we haven't finished downloading all pivots
         
         # remove the completed pivots from the list of pivots to download if a file with completed pivots is provided
         if completed_pivot_file:
@@ -133,7 +133,7 @@ class LandsatDataExporter:
                             
                             while self.check_active_tasks() >= self.max_tasks:
                                 logging.info("Max tasks reached, waiting...")
-                                time.sleep(600)
+                                time.sleep(60) # wait one minute before checking again
                             
                             task.start()
                             logging.info(f'Started export task for pivot {pivot_id} for {landsat_name}, image date: {image_date}')

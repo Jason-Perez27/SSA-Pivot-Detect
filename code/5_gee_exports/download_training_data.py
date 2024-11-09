@@ -64,7 +64,7 @@ log_name='collection_2_training_data.log'
 shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/1_script_data/filtered_center_pivots.shp'
 
 # The name of the google drive folder to save the data into
-drive_folder = 'collection2_landsat_data'
+drive_folder = 'training_data_c2'
 
 # GEE parameters
 service_account='gee-export-service@center-pivot-collection2.iam.gserviceaccount.com'
