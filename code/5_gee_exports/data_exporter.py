@@ -128,6 +128,11 @@ class LandsatDataExporter:
                                 'maxPixels': 10000000000000
                             }
                             task = ee.batch.Export.image.toDrive(**export_options)
+                            
+                            while self.check_active_tasks() >= self.max_tasks:
+                                logging.info("Max tasks reached, waiting...")
+                                time.sleep(600)
+                            
                             task.start()
                             logging.info(f'Started export task for pivot {pivot_id} for {landsat_name}, image date: {image_date}')
                 
@@ -151,6 +156,11 @@ class LandsatDataExporter:
     def qa_mask(self, image): # see  https://developers.google.com/earth-engine/landsat_c1_to_c2#colab-python
         # Mask out pixels where the QA_PIXEL bits indicate poor quality
         return image.updateMask(image.select('QA_PIXEL').bitwiseAnd(int('11111', 2)).eq(0))
+    
+    def check_active_tasks(self):
+        tasks = ee.batch.Task.list()
+        running_tasks = [task for task in tasks if task.state in ['RUNNING', 'READY']]
+        return len(running_tasks)
 
 # Test code
 if __name__ == '__main__':

@@ -2,3 +2,4 @@ geopandas
 earthengine-api
 numpy
 sklearn
+fiona
