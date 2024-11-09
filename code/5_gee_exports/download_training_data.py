@@ -14,7 +14,6 @@ but they are from collection 2, scaled according to GEE's recommendations, and h
 '''
 
 import os
-import logging
 from data_exporter import LandsatDataExporter
 
 '''
@@ -22,7 +21,7 @@ First, we reteive the information about the pivot IDs, month, year, and landsat 
 '''
 
 # Define the folder where the original TIF files are stored
-tif_folder = '/home/waves/data/SSA-Pivot-Detect/data/2_script_data/SSA_TIF_REQUEST'
+tif_folder = '/home/waves/data/SSA-Pivot-Detect/data/Data_collection_2_request'
 
 # Initialize empty lists to store the parsed information
 pivot_ids = []

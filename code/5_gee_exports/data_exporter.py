@@ -104,6 +104,8 @@ class LandsatDataExporter:
                         if months is not None and years is not None: 
                             image_count = 1
 
+                        logging.info(f'Starting download for {image_count} images for pivot {pivot_id} in {landsat_name} collection between {start_date} and {end_date}')
+
                         # Download the images to Google Drive
                         images = collection.toList(image_count)
                         for i in range(image_count):
@@ -172,7 +174,7 @@ if __name__ == '__main__':
     exporter = LandsatDataExporter(shapefile_path, drive_folder, service_account, service_account_key_path)
 
     # Test downloading data for training
-    exporter.download(log_name='c2_training_test.log', pivot_ids=[277,992], months=[6,4], years=[2017,2014], landsats=[8,8], buffer=True, max_cloud_cover=10)
+    exporter.download(log_name='c2_training_test.log', pivot_ids=[277,992], months=[6,4], years=[2017,2014], landsats=["Landsat8","Landsat8"], buffer=True, max_cloud_cover=10)
 
     # Test downloading the full time series
     exporter.download(log_name='c2_time_series_test.log', pivot_ids=[277,992], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
