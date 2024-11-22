@@ -1,59 +1,84 @@
 import pandas as pd
 
-# Path to the CSV file
-csv_file_path = '/home/waves/data/SSA-Pivot-Detect/data/3_script_data/5Landsat_total_data.csv'
+# Path to the Excel file
+csv_file_path = 'c:/Users/jdper/Desktop/collection_2_dataset_unsplit.xlsx'
+# Load the Excel file into a DataFrame
+df = pd.read_excel(csv_file_path)
 
-# Load the CSV file into a DataFrame
-df = pd.read_csv(csv_file_path)
-
-# Dictionary mapping Landsat versions to their band names for Collection 2
+# Dictionary mapping Landsat versions to their band names
 band_names = {
-    "Landsat_4_5": {
-        "SR_B1": "Blue",
-        "SR_B2": "Green",
-        "SR_B3": "Red",
-        "SR_B4": "Near_Infrared",
-        "SR_B5": "SWIR1",
-        "ST_B6": "Thermal",
-        "SR_B7": "SWIR2",
-        "QA_PIXEL": "Pixel_QA"
+    "Landsat_4_5_7": {
+        "B1": "BLUE",
+        "B2": "GREEN",
+        "B3": "RED",
+        "B4": "NIR",
+        "B5": "SWIR1",
+        "B6": "SWIR2",
+        "B7": "ATMOS_OPACITY",
+        "B8": "CLOUD_QA",
+        "B9": "TIR",
+        "B10": "ATMOS_TRANSMITTANCE",
+        "B11": "CLOUD_DISTANCE",
+        "B12": "DOWNWARD_RADIANCE",
+        "B13": "EMISSITIVITY",
+        "B14": "EMISSITIVITY_SD",
+        "B15": "QA",
+        "B16": "UPWARD_RADIANCE",
+        "B17": "UPWARD_RADIANCE_SD",
+        "B18": "PIXEL_QA",
+        "B19": "RADIOMETRIC_SATURATION_QA"
     },
-    "Landsat_7_8_9": {
-        "SR_B1": "Coastal_Aerosol",
-        "SR_B2": "Blue",
-        "SR_B3": "Green",
-        "SR_B4": "Red",
-        "SR_B5": "Near_Infrared",
-        "SR_B6": "SWIR1",
-        "SR_B7": "SWIR2",
-        "ST_B10": "TIRS1",
-        "ST_B11": "TIRS2",
-        "QA_PIXEL": "Pixel_QA",
-        "QA_RADSAT": "Radiometric_Saturation_QA"
+    "Landsat_8_9": {
+        "B1": "COASTAL_AEROSOL",
+        "B2": "BLUE",
+        "B3": "GREEN",
+        "B4": "RED",
+        "B5": "NIR",
+        "B6": "SWIR1",
+        "B7": "SWIR2",
+        "B8": "AEROSOL_QA",
+        "B9": "TIR",
+        "B10": "ATMOS_TRANSMITTANCE",
+        "B11": "CLOUD_DISTANCE",
+        "B12": "DOWNWARD_RADIANCE",
+        "B13": "EMISSITIVITY",
+        "B14": "EMISSITIVITY_SD",
+        "B15": "QA",
+        "B16": "UPWARD_RADIANCE",
+        "B17": "UPWARD_RADIANCE_SD",
+        "B18": "PIXEL_QA",
+        "B19": "RADIOMETRIC_SATURATION_QA"
     }
 }
 
-# Function to rename columns for the entire DataFrame based on Landsat version
 def rename_columns_based_on_landsat(df):
-    # Determine the Landsat version and apply appropriate column names
-    for version_key, names_map in band_names.items():
-        # Check if the Landsat version is in the DataFrame
-        if any(version_key.split('_')[-1] in s for s in df['Landsat'].unique()):
-            # Map old column names to new names based on the dictionary
-            rename_dict = {old: new for old, new in names_map.items() if old in df.columns}
-            df.rename(columns=rename_dict, inplace=True)
+    # Create a new DataFrame to store renamed columns
+    df_renamed = df.copy()
+
+    # Apply renaming based on Landsat version
+    for landsat_version, names_map in band_names.items():
+        if landsat_version == "Landsat_4_5_7":
+            version_rows = df['Landsat'].isin(['Landsat4', 'Landsat5', 'Landsat7'])
+        elif landsat_version == "Landsat_8_9":
+            version_rows = df['Landsat'].isin(['Landsat8', 'Landsat9'])
+        else:
+            continue
+
+        # Map old column names to new names based on the dictionary
+        for old, new in names_map.items():
+            if old in df.columns:
+                # If the new column already exists, append the data
+                if new in df_renamed.columns:
+                    df_renamed.loc[version_rows, new] += df.loc[version_rows, old]
+                else:
+                    df_renamed.loc[version_rows, new] = df.loc[version_rows, old]
 
     # Drop any remaining old band columns that are not needed
     old_cols = set([col for sublist in band_names.values() for col in sublist])
-    cols_to_drop = [col for col in old_cols if col in df.columns and col not in rename_dict.values()]
-    df.drop(columns=cols_to_drop, inplace=True, errors='ignore')
+    cols_to_drop = [col for col in df.columns if col in old_cols]
+    df_renamed.drop(columns=cols_to_drop, inplace=True, errors='ignore')
 
-    return df
+    return df_renamed
 
-# Apply the renaming function to the DataFrame
 df_renamed = rename_columns_based_on_landsat(df)
-
-# Save the updated DataFrame back to CSV
-df_renamed.to_csv(csv_file_path, index=False)
-
-print("CSV file has been updated with new band names for Landsat Collection 2.")
+df_renamed.to_excel('c:/Users/jdper/Desktop/collection_2_dataset_unsplit_renamed.xlsx', index=False)

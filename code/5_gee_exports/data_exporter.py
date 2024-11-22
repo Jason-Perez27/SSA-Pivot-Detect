@@ -166,10 +166,10 @@ class LandsatDataExporter:
 
 # Test code
 if __name__ == '__main__':
-    shapefile_path = '/home/waves/data/SSA-Pivot-Detect/data/1_script_data/filtered_center_pivots.shp'
+    shapefile_path = 'c:\Users\jdper\Desktop\filtered_center_pivots.shp'
     drive_folder = 'landsat_test'
     service_account='gee-export-service@center-pivot-collection2.iam.gserviceaccount.com'
-    service_account_key_path = '/home/waves/data/SSA-Pivot-Detect/center-pivots-collection2-1408cb0e7b9f.json'
+    service_account_key_path = 'c:\Users\jdper\Desktop\center-pivots-collection2-1408cb0e7b9f.json'
 
     exporter = LandsatDataExporter(shapefile_path, drive_folder, service_account, service_account_key_path)
 
