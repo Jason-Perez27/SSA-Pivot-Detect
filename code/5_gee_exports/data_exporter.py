@@ -6,13 +6,9 @@ import time
 import random
 
 class LandsatDataExporter:
-    def __init__(self, shapefile_path, drive_folder, service_account, service_account_key_path, max_tasks=50):
-        # Initialize GEE and other parameters
-        credentials = ee.ServiceAccountCredentials(
-            service_account,
-            service_account_key_path
-        )
-        ee.Initialize(credentials)
+    def __init__(self, shapefile_path, drive_folder, max_tasks=50):
+        # Initialize GEE
+        ee.Initialize()
         
         self.drive_folder = drive_folder
         self.center_pivot_gdf = gpd.read_file(shapefile_path)
@@ -168,13 +164,11 @@ class LandsatDataExporter:
 if __name__ == '__main__':
     shapefile_path = 'c:\Users\jdper\Desktop\filtered_center_pivots.shp'
     drive_folder = 'landsat_test'
-    service_account='gee-export-service@center-pivot-collection2.iam.gserviceaccount.com'
-    service_account_key_path = 'c:\Users\jdper\Desktop\center-pivots-collection2-1408cb0e7b9f.json'
 
-    exporter = LandsatDataExporter(shapefile_path, drive_folder, service_account, service_account_key_path)
+    exporter = LandsatDataExporter(shapefile_path, drive_folder)
 
     # Test downloading data for training
-    exporter.download(log_name='c2_training_test.log', pivot_ids=[277,992], months=[6,4], years=[2017,2014], landsats=["Landsat8","Landsat8"], buffer=True, max_cloud_cover=10)
+    exporter.download(log_name='c2_training_test.log', pivot_ids=[277,992,3424], months=[6,4,5], years=[2017,2014,1989], landsats=["Landsat8","Landsat8","Landsat4"], buffer=True, max_cloud_cover=10)
 
     # Test downloading the full time series
     exporter.download(log_name='c2_time_series_test.log', pivot_ids=[277,992], buffer=False, max_cloud_cover=100, completed_pivot_file='completed_pivots_test.txt')
